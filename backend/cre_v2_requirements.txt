@@ -1,0 +1,4 @@
+opencv-python-headless==5.0.0.93
+scenedetect==0.7.1
+open_clip_torch==3.3.0
+torchvision==0.28.0

@@ -1,0 +1,190 @@
+{
+  "id": "PODCAST_HIGH_RETENTION_FAST_SPEECH_V1",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "status": "contract_proposal",
+  "description": "20â€“30 second vertical podcast excerpt for verified fast speech; preserve exact word timing while allowing denser readable phrases.",
+  "hard_limits": {
+    "fps": 30,
+    "output_width_px": 1080,
+    "output_height_px": 1920,
+    "min_duration_frames": 600,
+    "max_duration_frames": 900,
+    "max_segments": 7,
+    "min_segment_frames": 45,
+    "max_punch_ins": 3,
+    "min_punch_frames": 45,
+    "max_punch_frames": 120,
+    "max_zoom_milli": 1120,
+    "min_zoom_ramp_frames": 6,
+    "min_punch_start_spacing_frames": 150,
+    "min_caption_frames": 12,
+    "max_caption_frames": 75,
+    "max_words_per_caption": 5,
+    "max_caption_characters": 42,
+    "max_caption_characters_per_second": 38,
+    "max_emphasized_words_per_caption": 1,
+    "max_emphasized_word_ratio_milli": 200,
+    "max_b_roll_events": 2,
+    "min_b_roll_frames": 120,
+    "max_b_roll_frames": 150,
+    "max_b_roll_coverage_milli": 400,
+    "min_b_roll_start_spacing_frames": 240,
+    "max_sfx_events": 1,
+    "min_sfx_start_spacing_frames": 240,
+    "max_sfx_duration_frames": 24,
+    "max_sfx_gain_db": 10,
+    "min_sfx_fade_frames": 2,
+    "max_music_gain_db": 1000,
+    "min_music_fade_frames": 15,
+    "max_music_fade_frames": 30,
+    "max_overlays": 2,
+    "min_overlay_frames": 45,
+    "max_overlay_frames": 900,
+    "max_overlay_characters": 80,
+    "max_transitions": 0,
+    "max_decoration_events": 7,
+    "min_decoration_start_spacing_frames": 30
+  },
+  "editorial_rules": {
+    "pacing": [
+      "Select a self-contained hook, claim, and payoff. Target 24â€“27 seconds; accept 20â€“30. Never pad or speed speech to hit duration.",
+      "Preserve original wording, chronological order, negations, qualifiers and the speakerâ€™s meaning. Prefer omission of effects over visual clutter.",
+      "Keep deliberate micro-pauses and breaths when they carry meaning. If a safe 20â€“30 second excerpt is impossible, return a planning failure outside this edit-plan contract."
+    ],
+    "silence_removal": {
+      "analysis_window_ms": 20,
+      "analysis_hop_ms": 10,
+      "candidate_min_silence_ms": 320,
+      "candidate_condition": "No speech in a versioned VAD analysis AND RMS below max(-50 dBFS, measured noise floor + 6 dB). VAD/RMS are planning evidence, never permission to cut through phonemes.",
+      "target_remaining_gap_ms": [
+        100,
+        180
+      ],
+      "preserve_after_word_ms": 60,
+      "preserve_before_word_ms": 60,
+      "cut_boundary_guard_ms": 40,
+      "rule": "Only shorten safe silence candidates. Keep a longer rhetorical pause when shortening damages cadence. Inspect breaths, laughter, crosstalk and word alignment. Do not automatically remove all low-energy audio.",
+      "rounding": "Map safe kept boundaries outward to source frames: floor incoming start, ceil outgoing end. Retest remaining gap and guards after quantization."
+    },
+    "cuts": [
+      "Hard cuts only; at most six internal cuts. No cut through a word, breath onset, meaningful reaction, or syllable.",
+      "Remove dead space using omitted source ranges between kept segments; do not emit a second remove operation.",
+      "Keep source audio/video locked at 1x speed. No reordered, repeated or synthesized words. Consolidate source-contiguous segments."
+    ],
+    "punch_ins": [
+      "Use zero to three purposeful emphasis events, normally 1.06â€“1.10x, never over 1.12x.",
+      "Ramp from 1.0x over at least six frames, hold, and return to 1.0x over at least six frames. Center on the base crop.",
+      "No punch spanning a cut, overlapping B-roll, or hiding a face/gesture. Space starts by at least five seconds."
+    ],
+    "captions": [
+      "Faithful spoken wording, including qualifiers; punctuation is allowed. Do not invent or paraphrase dialogue.",
+      "Group one to three words into fast short phrases, at most two lines. Keep an unusually long word alone. Word-level active highlighting is driven by explicit timings.",
+      "Highlight at most one selected keyword per cue and at most 20% of words overall. Zero emphasis is valid.",
+      "Retiming maps source word bounds through the cut map. Never display a removed word. Inspect word alignment within two frames."
+    ],
+    "b_roll": "Use one or two 4-5 second cinematic B-roll inserts with visible motion. Return to the podcast between inserts. Captions pause during each insert and resume afterward.",
+    "music": [
+      "Optional single instrumental bed with no distracting vocals, busy percussion or dramatic drops.",
+      "Approved audio preprocessed to -16 LUFS integrated and <= -1 dBTP. Speech is separately normalized to the same reference before mixing.",
+      "Explicit gain envelope, never louder than -28 dB relative to the normalized bed. Use -30 to -34 dB as a starting point.",
+      "Cover the entire clip with 0.5â€“1.0 second fades to/from digital mute. No loops, beat detection, automatic ducking or sidechain defaults in v1.",
+      "Listen to the final mix; this conservative bed level does not by itself guarantee intelligibility."
+    ],
+    "sfx": [
+      "Zero or one approved sound at the first B-roll start. At most 0.8 seconds; use the saved sound-effect gain, up to +10 dB.",
+      "At least two-frame fades at each edge. No effect on every word, repeated whooshes or startling transients."
+    ],
+    "transitions": [
+      "Hard cuts between all shots. Explicit transition array must be empty for this profile. No dissolves, wipes, glitches or flashes."
+    ],
+    "framing": [
+      "One explicit static crop per kept segment. Crop must fit the source and exactly match output 9:16 aspect ratio.",
+      "Keep eyes near the upper third, protect face/headroom and meaningful hand gestures. Crop must remain safe through the entire segment.",
+      "Do not guess a crop for moving or off-center subjects. If static framing cannot preserve the subject, request review or replan; tracking is outside v1."
+    ],
+    "effect_budget": [
+      "Count punch-ins, B-roll entries, SFX and overlays together: at most five decorations per clip; starts at least one second apart.",
+      "Captions, base crops, hard cuts, and the continuous music bed do not count as decorations. Budgets are ceilings, not quotas.",
+      "At most one visual decoration active: punch-in OR B-roll OR text overlay. SFX may accompany a visual event subject to start spacing."
+    ],
+    "prohibited": [
+      "speed ramps",
+      "time stretching",
+      "random zooms",
+      "flashing text",
+      "caption bouncing",
+      "emoji spam",
+      "unapproved remote assets",
+      "executable code or FFmpeg expressions",
+      "meaning-changing cuts",
+      "invented speech",
+      "face-obscuring overlays",
+      "silent fallback for unknown operations"
+    ]
+  },
+  "render_presets": {
+    "podcast_dynamic_v1": {
+      "font_asset": "cre_font_inter_bold_v1",
+      "font_size_px": 64,
+      "font_weight": 700,
+      "max_lines": 2,
+      "box_px": {
+        "x": 90,
+        "y": 1350,
+        "width": 900,
+        "height": 240
+      },
+      "horizontal_align": "center",
+      "vertical_align": "center",
+      "text_color": "#FFFFFF",
+      "active_word_color": "#FFE066",
+      "emphasis_color": "#7DD3FC",
+      "color_priority": [
+        "active_word",
+        "emphasis",
+        "normal"
+      ],
+      "outline_color": "#000000",
+      "outline_width_px": 4,
+      "background_color": "#000000",
+      "background_opacity_milli": 550,
+      "line_height_px": 78,
+      "word_animation": "color_only",
+      "cue_animation": "none",
+      "line_break": "greedy whitespace wrap to measured glyph width; fail if more than two lines; never auto-shrink",
+      "timing": "Whole cue visible on [start,end); highlight word only on its [start,end). No active word in timing gaps."
+    },
+    "label_v1": {
+      "font_asset": "cre_font_inter_bold_v1",
+      "font_size_px": 48,
+      "text_color": "#FFFFFF",
+      "background_color": "#000000",
+      "background_opacity_milli": 700,
+      "box_px": {
+        "x": 90,
+        "y": 180,
+        "width": 900,
+        "height": 150
+      },
+      "max_lines": 2,
+      "line_height_px": 60,
+      "horizontal_align": "center",
+      "vertical_align": "center",
+      "line_break": "greedy whitespace wrap; reject overflow",
+      "animation": "none"
+    },
+    "audio": {
+      "dialogue_gain_db": 0,
+      "internal_cut_audio_fade_ms": 3,
+      "fade_law": "linear_amplitude",
+      "master_limiter": false,
+      "reject_final_true_peak_above_dbTP": -1
+    }
+  },
+  "release_requirements": [
+    "Pin exact font bytes and shaping/rasterization implementation in a renderer capability manifest before production acceptance.",
+    "Freeze this profile version and asset-normalization recipe together; changed values require a new profile version.",
+    "All automatic checks plus source-word, framing, licensing and final-mix review must pass. Fake examples are structural fixtures, not renderable media."
+  ]
+}

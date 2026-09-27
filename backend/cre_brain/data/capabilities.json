@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "schema_sha256": "98ba80b6a58687ec5b3a92ea8d5742b64df4a6bab999ca58f4e056caa505c385",
+  "profile_sha256": "feec77faa463de5bedfb004bce846ad19069e9b403d8113e636f5846b7175ba3",
+  "renderer_id": "cre_ffmpeg_adapter_v1",
+  "renderer_version": "1.9.0",
+  "scaler_version": "ffmpeg-inset-wide-lanczos-v2",
+  "audio_engine_version": "ffmpeg-filter-complex-v1",
+  "encoder_version": "libx264-aac-v1",
+  "operations": [
+    "hard_cuts_v1",
+    "static_crop_v1",
+    "dialogue_splice_fade_v1",
+    "captions_word_color_v1",
+    "center_zoom_linear_v1",
+    "wide_frame_letterbox_v1",
+    "caption_safe_zones_v1",
+    "speaker_palette_v1",
+    "caption_smooth_fade_v1",
+    "caption_face_anchor_v1",
+    "caption_one_shot_face_stack_v1"
+  ],
+  "languages": [
+    "en"
+  ],
+  "max_output_pixel_frames": 2000000000,
+  "layout_engine": "pillow-caption-safe-zones-v7",
+  "pillow_version": "12.3.0",
+  "font": {
+    "asset_id": "cre_font_inter_bold_v1",
+    "path": "C:\\Users\\maxxy\\AppData\\Local\\Programs\\Opera GX\\135.0.5973.94\\resources\\fonts\\Inter-Bold.ttf",
+    "sha256": "0cb1bc1335372d9e3a0cf6f5311c7cce87af90d2a777fdeec18be605a2a70bc1"
+  }
+}

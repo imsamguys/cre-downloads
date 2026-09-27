@@ -1,0 +1,884 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cre:edit-plan:1.0.0",
+  "title": "CRE Edit Plan v1",
+  "description": "Strict data contract. Must also pass semantic, profile, asset and capability validation; JSON Schema alone is insufficient.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "clip",
+    "profile",
+    "render"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "clip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "language",
+        "source_asset_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "language": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
+        },
+        "source_asset_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "niche",
+        "style"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "PODCAST_HIGH_RETENTION_V1",
+            "PODCAST_HIGH_RETENTION_FAST_SPEECH_V1"
+          ]
+        },
+        "version": {
+          "const": "1.0.0"
+        },
+        "niche": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "style": {
+          "const": "clear_professional_retention"
+        }
+      }
+    },
+    "render": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timebase",
+        "output",
+        "assets",
+        "segments",
+        "reframes",
+        "punch_ins",
+        "caption_style",
+        "captions",
+        "b_roll",
+        "music",
+        "sfx",
+        "transitions",
+        "overlays"
+      ],
+      "properties": {
+        "timebase": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fps",
+            "interval_convention"
+          ],
+          "properties": {
+            "fps": {
+              "enum": [
+                24,
+                25,
+                30,
+                60
+              ]
+            },
+            "interval_convention": {
+              "const": "half_open"
+            }
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width_px",
+            "height_px",
+            "duration_frames",
+            "audio_sample_rate",
+            "audio_channels"
+          ],
+          "properties": {
+            "width_px": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 3840
+            },
+            "height_px": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 3840
+            },
+            "duration_frames": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7200
+            },
+            "audio_sample_rate": {
+              "const": 48000
+            },
+            "audio_channels": {
+              "const": 2
+            }
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/asset"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/segment"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "reframes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reframe"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "punch_ins": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/punch_in"
+          },
+          "minItems": 0,
+          "maxItems": 12
+        },
+        "caption_style": {
+          "enum": [
+            "podcast_dynamic_v1"
+          ]
+        },
+        "captions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/caption"
+          },
+          "minItems": 0,
+          "maxItems": 120
+        },
+        "b_roll": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/b_roll"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "music": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/music"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sfx": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sfx"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/transition"
+          },
+          "minItems": 0,
+          "maxItems": 2
+        },
+        "overlays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/overlay"
+          },
+          "minItems": 0,
+          "maxItems": 4
+        }
+      }
+    },
+    "editorial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confidence_milli",
+        "review_recommended",
+        "summary",
+        "notes",
+        "warnings"
+      ],
+      "properties": {
+        "confidence_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "review_recommended": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/note"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "minItems": 0,
+          "maxItems": 16
+        }
+      }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "sha256",
+        "duration_frames",
+        "width_px",
+        "height_px",
+        "has_audio"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "kind": {
+          "enum": [
+            "video",
+            "image",
+            "audio"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "duration_frames": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 108000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "width_px": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 16384
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "height_px": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 16384
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "has_audio": {
+          "type": "boolean"
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_in_frame",
+        "source_out_frame",
+        "output_start_frame"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "source_in_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "source_out_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "output_start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        }
+      }
+    },
+    "crop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x_px",
+        "y_px",
+        "width_px",
+        "height_px"
+      ],
+      "properties": {
+        "x_px": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16383
+        },
+        "y_px": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 16383
+        },
+        "width_px": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 16384
+        },
+        "height_px": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 16384
+        }
+      }
+    },
+    "reframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "segment_id",
+        "crop"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "segment_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "crop": {
+          "$ref": "#/$defs/crop"
+        }
+      }
+    },
+    "zoom_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame",
+        "scale_milli"
+      ],
+      "properties": {
+        "frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "scale_milli": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 1250
+        }
+      }
+    },
+    "punch_in": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "keyframes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "keyframes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/zoom_key"
+          },
+          "minItems": 3,
+          "maxItems": 8
+        }
+      }
+    },
+    "word": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "start_frame",
+        "end_frame",
+        "emphasis"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "emphasis": {
+          "type": "boolean"
+        }
+      }
+    },
+    "caption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "words"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "words": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/word"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "caption_placement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "side",
+            "anchor_x",
+            "anchor_y",
+            "max_text_width"
+          ],
+          "properties": {
+            "side": {
+              "enum": [
+                "left",
+                "right",
+                "below"
+              ]
+            },
+            "anchor_x": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 760
+            },
+            "anchor_y": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 428
+            },
+            "max_text_width": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 760
+            }
+          }
+        }
+      }
+    },
+    "b_roll": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "asset_id",
+        "source_in_frame",
+        "fit",
+        "playback",
+        "opacity_milli"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "source_in_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "fit": {
+          "enum": [
+            "cover_center",
+            "contain_black"
+          ]
+        },
+        "playback": {
+          "enum": [
+            "normal",
+            "still"
+          ]
+        },
+        "opacity_milli": {
+          "const": 1000
+        }
+      }
+    },
+    "gain_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame",
+        "gain_db"
+      ],
+      "properties": {
+        "frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "gain_db": {
+          "type": "integer",
+          "minimum": -80,
+          "maximum": 1000
+        }
+      }
+    },
+    "music": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "asset_id",
+        "source_in_frame",
+        "gain_keyframes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "source_in_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "gain_keyframes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gain_key"
+          },
+          "minItems": 2,
+          "maxItems": 64
+        }
+      }
+    },
+    "sfx": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "asset_id",
+        "source_in_frame",
+        "gain_db",
+        "fade_in_frames",
+        "fade_out_frames"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "asset_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "source_in_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "gain_db": {
+          "type": "integer",
+          "minimum": -48,
+          "maximum": 1000
+        },
+        "fade_in_frames": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "fade_out_frames": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "kind": {
+          "enum": [
+            "fade_from_black",
+            "fade_to_black"
+          ]
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "text",
+        "position",
+        "style"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "start_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "end_frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 108000
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "position": {
+          "enum": [
+            "top_safe",
+            "bottom_center"
+          ]
+        },
+        "style": {
+          "enum": [
+            "label_v1"
+          ]
+        }
+      }
+    },
+    "note": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_id",
+        "confidence_milli",
+        "reason_code",
+        "summary"
+      ],
+      "properties": {
+        "target_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        },
+        "confidence_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "reason_code": {
+          "enum": [
+            "remove_silence",
+            "preserve_rhythm",
+            "clarify_concept",
+            "highlight_statement",
+            "support_mood",
+            "readability",
+            "composition",
+            "no_effect_needed"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}
